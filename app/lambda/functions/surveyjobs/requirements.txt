@@ -1,0 +1,4 @@
+requests
+pandas
+click
+python-json-logger

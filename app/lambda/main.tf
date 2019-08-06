@@ -1,0 +1,275 @@
+terraform {
+  required_version = ">= 0.11.8"
+  backend "s3" {
+    bucket         = "my90-tf"
+    key            = "my90-api-lambda"
+    region         = "us-east-1"
+    dynamodb_table = "my90-terraform-lock"
+  }
+}
+
+provider "aws" {
+    version = "~> 1.39"
+    assume_role {
+      role_arn     = "${var.aws_role_arn}"
+    }
+}
+
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+locals { 
+    aws_account_id   = "${var.aws_account_id}"
+    aws_region       = "${data.aws_region.current.name}"
+    lambda_base_dir  = "${path.module}/functions"
+    environment_slug = "${lower(terraform.workspace)}"
+}
+
+data "terraform_remote_state" "dynamodb" {
+  backend = "s3"
+  workspace = "${terraform.workspace}"
+  config {
+    bucket         = "my90-tf"
+    key            = "my90-api-dynamodb"
+    region         = "us-east-1"
+    dynamodb_table = "my90-terraform-lock"
+  }
+}
+
+data "terraform_remote_state" "sqs" {
+  backend = "s3"
+  workspace = "${terraform.workspace}"
+  config {
+    bucket         = "my90-tf"
+    key            = "my90-api-sqs"
+    region         = "us-east-1"
+    dynamodb_table = "my90-terraform-lock"
+  }
+}
+
+data "terraform_remote_state" "kms" {
+  backend = "s3"
+  workspace = "${terraform.workspace}"
+  config {
+    bucket         = "my90-tf"
+    key            = "my90-api-kms"
+    region         = "us-east-1"
+    dynamodb_table = "my90-terraform-lock"
+  }
+}
+
+resource "aws_s3_bucket" "my90_lambda_bucket" {
+  bucket = "my90-lambda-${local.aws_region}-${local.aws_account_id}"
+  acl    = "private"
+
+  versioning {
+    enabled = true
+  }
+}
+
+#-------------------------------------------------------------------------------
+#-- CRUD Handler
+#-------------------------------------------------------------------------------
+data "template_file" "lambda_role_policy_template" {
+    template = "${file("${path.module}/lambda_role_policy.tpl")}"
+    vars {
+        aws_account_id = "${local.aws_account_id}"
+        aws_region     = "${local.aws_region}"
+    }
+}
+
+resource "aws_iam_role_policy" "lambda_role_policy" {
+  name = "lambda_role_policy"
+  role = "${aws_iam_role.crud_lambda_role.id}"
+
+  policy = "${data.template_file.lambda_role_policy_template.rendered}"
+}
+
+resource "aws_iam_role" "crud_lambda_role" {
+  name = "crud_lambda_role-${local.environment_slug}"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+module "crud_handler_archive" {
+  source      = "rojopolis/lambda-python-archive/aws"
+  version     = "0.1.4"
+  src_dir     = "${local.lambda_base_dir}/crud_handler"
+  output_path = "${path.module}/artifacts/crud_handler.zip"
+}
+
+resource "aws_s3_bucket_object" "crud_handler_archive_object" {
+  bucket = "${aws_s3_bucket.my90_lambda_bucket.id}"
+  key    = "crud_handler.zip"
+  source = "${module.crud_handler_archive.archive_path}"
+  etag   = "${md5(file("${module.crud_handler_archive.archive_path}"))}"
+}
+
+resource "aws_lambda_function" "crud_handler" {
+    s3_bucket        = "${aws_s3_bucket.my90_lambda_bucket.id}"
+    s3_key           = "${aws_s3_bucket_object.crud_handler_archive_object.id}"
+    s3_object_version= "${aws_s3_bucket_object.crud_handler_archive_object.version_id}"
+    function_name    = "crud_handler-${local.environment_slug}"
+    role             = "${aws_iam_role.crud_lambda_role.arn}"
+    handler          = "app.entrypoint"
+    source_code_hash = "${module.crud_handler_archive.source_code_hash}"
+    runtime          = "python3.6"
+    publish          = true
+    environment {
+        variables = {
+          AGENCY_TABLE_ID = "${data.terraform_remote_state.dynamodb.agencies_table_id}"
+        }
+    }
+}
+
+#-------------------------------------------------------------------------------
+#-- SurveyJobs
+#-------------------------------------------------------------------------------
+resource "aws_s3_bucket" "my90_survey_bucket" {
+  bucket = "my90-survey-${local.aws_region}-${local.aws_account_id}"
+  acl    = "private"
+
+  versioning {
+    enabled = true
+  }
+}
+
+module "surveyjobs_handler_archive" {
+  source      = "rojopolis/lambda-python-archive/aws"
+  version     = "0.1.4"
+  src_dir     = "${local.lambda_base_dir}/surveyjobs"
+  output_path = "${path.module}/artifacts/surveyjobs.zip"
+}
+
+resource "aws_s3_bucket_object" "surveyjobs_handler_archive_object" {
+  bucket = "${aws_s3_bucket.my90_lambda_bucket.id}"
+  key    = "surveyjobs.zip"
+  source = "${module.surveyjobs_handler_archive.archive_path}"
+  etag   = "${md5(file("${module.surveyjobs_handler_archive.archive_path}"))}"
+}
+
+resource "aws_lambda_function" "surveyjobs_handler" {
+    s3_bucket        = "${aws_s3_bucket.my90_lambda_bucket.id}"
+    s3_key           = "${aws_s3_bucket_object.surveyjobs_handler_archive_object.id}"
+    s3_object_version= "${aws_s3_bucket_object.surveyjobs_handler_archive_object.version_id}"
+    function_name    = "surveyjobs-${local.environment_slug}"
+    role             = "${aws_iam_role.surveyjobs_lambda_role.arn}"
+    handler          = "qualtrics.entrypoint"
+    source_code_hash = "${module.surveyjobs_handler_archive.source_code_hash}"
+    runtime          = "python3.6"
+    publish          = true
+    timeout          = 300
+    environment {
+      variables = {
+        S3_BUCKET         = "${aws_s3_bucket.my90_survey_bucket.id}"
+        X_API_TOKEN       = "${var.qualtrics_api_key}"
+        AGENCIES_TABLE_ID = "${data.terraform_remote_state.dynamodb.agencies_table_id}"
+        KMS_KEY           = "${data.terraform_remote_state.kms.kms_key}"
+      }
+    }
+}
+
+resource "aws_iam_role_policy" "surveyjobs_role_policy" {
+  name = "lambda_role_policy"
+  role = "${aws_iam_role.surveyjobs_lambda_role.id}"
+
+  policy = "${data.template_file.lambda_role_policy_template.rendered}"
+}
+
+resource "aws_iam_role" "surveyjobs_lambda_role" {
+  name = "surveyjobs_lambda_role-${local.environment_slug}"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_lambda_event_source_mapping" "etl_event_source_mapping" {
+  event_source_arn  = "${data.terraform_remote_state.sqs.etl_queue_arn}"
+  function_name     = "${aws_lambda_function.surveyjobs_handler.qualified_arn}"
+}
+
+#-------------------------------------------------------------------------------
+#-- ProducerJobs
+#-------------------------------------------------------------------------------
+module "producerjobs_handler_archive" {
+  source      = "rojopolis/lambda-python-archive/aws"
+  version     = "0.1.4"
+  src_dir     = "${local.lambda_base_dir}/producerjobs"
+  output_path = "${path.module}/artifacts/producerjobs.zip"
+}
+
+resource "aws_s3_bucket_object" "producerjobs_handler_archive_object" {
+  bucket = "${aws_s3_bucket.my90_lambda_bucket.id}"
+  key    = "producerjobs.zip"
+  source = "${module.producerjobs_handler_archive.archive_path}"
+  etag   = "${md5(file("${module.producerjobs_handler_archive.archive_path}"))}"
+}
+
+resource "aws_lambda_function" "producerjobs_handler" {
+    s3_bucket        = "${aws_s3_bucket.my90_lambda_bucket.id}"
+    s3_key           = "${aws_s3_bucket_object.producerjobs_handler_archive_object.id}"
+    s3_object_version= "${aws_s3_bucket_object.producerjobs_handler_archive_object.version_id}"
+    function_name    = "producerjobs-${local.environment_slug}"
+    role             = "${aws_iam_role.producerjobs_lambda_role.arn}"
+    handler          = "dyno2sqs.entrypoint"
+    source_code_hash = "${module.producerjobs_handler_archive.source_code_hash}"
+    runtime          = "python3.6"
+    publish          = true
+    environment {
+      variables = {
+        PRODUCER_JOB_QUEUE = "${data.terraform_remote_state.sqs.etl_queue_name}"
+        PRODUCER_JOB_TABLE = "${data.terraform_remote_state.dynamodb.producer_table_id}"
+      }
+    }
+}
+
+resource "aws_iam_role_policy" "producerjobs_role_policy" {
+  name = "lambda_role_policy"
+  role = "${aws_iam_role.producerjobs_lambda_role.id}"
+
+  policy = "${data.template_file.lambda_role_policy_template.rendered}"
+}
+
+resource "aws_iam_role" "producerjobs_lambda_role" {
+  name = "producerjobs_lambda_role-${local.environment_slug}"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
