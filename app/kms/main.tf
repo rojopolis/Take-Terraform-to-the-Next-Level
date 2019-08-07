@@ -10,11 +10,11 @@ terraform {
 
 provider "aws" {
   version = "~> 2.7"
-  region = "us-east-1"
+  region  = "us-east-1"
 }
 
-locals { 
-    environment_slug = "${lower(terraform.workspace)}"
+locals {
+  environment_slug = "${lower(terraform.workspace)}"
 }
 
 resource "aws_kms_key" "rojopolis_key" {

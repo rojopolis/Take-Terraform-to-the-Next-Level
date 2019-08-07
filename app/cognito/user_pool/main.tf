@@ -10,7 +10,7 @@ terraform {
 
 provider "aws" {
   version = "~> 2.7"
-  region = "us-east-1"
+  region  = "us-east-1"
 }
 
 data "aws_caller_identity" "current" {}
@@ -67,13 +67,13 @@ resource "aws_cognito_resource_server" "rojopolis_user_pool_resource_server" {
 
 
   scope {
-      scope_name        = "agency.read"
-      scope_description = "Users can read agency resources"
-    }
+    scope_name        = "agency.read"
+    scope_description = "Users can read agency resources"
+  }
   scope {
-      scope_name        = "questionResponses.read"
-      scope_description = "Users can read questionResponses resources"
-    }/*
+    scope_name        = "questionResponses.read"
+    scope_description = "Users can read questionResponses resources"
+  } /*
     {
       scope_name        = "questions.read"
       scope_description = "Users can read questions resources"
