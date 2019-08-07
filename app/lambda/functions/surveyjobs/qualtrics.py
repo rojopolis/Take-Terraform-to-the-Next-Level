@@ -437,8 +437,8 @@ def make_record(iloc, extra=None, questions_choices=None):
             
             new_rec["Date"] = str(time.mktime(dateutil.parser.parse(iloc.get("Date")).timetuple()))
             new_rec["IncidentId"] = iloc.get("IncidentId")
-            new_rec["my90EncounterScore"] = iloc.get("my90EncounterScore")
-            new_rec["my90GeneralScore"] = iloc.get("my90GeneralScore")
+            new_rec["rojopolisEncounterScore"] = iloc.get("rojopolisEncounterScore")
+            new_rec["rojopolisGeneralScore"] = iloc.get("rojopolisGeneralScore")
             
             #handle empty phone set to: 00000000000
             phone_number = iloc.get("PhoneNumber") or "00000000000"
@@ -691,7 +691,7 @@ def sync_db(csvfile, bucket, agencyid, queue, surveyid, apitoken):
     
     To test locally:
 
-    python qualtrics.py sync-db --bucket my90-survey-us-east-1-698112575222 \
+    python qualtrics.py sync-db --bucket rojopolis-survey-us-east-1-698112575222 \
             --csvfile "SV_cGXWxvADgIihxrf-Example Qualtrics Output.csv"
 
     """

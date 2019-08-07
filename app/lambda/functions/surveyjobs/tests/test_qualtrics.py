@@ -6,11 +6,11 @@ import math
 
 @pytest.fixture
 def setup_qualtrics_stub():
-    rec = {"My90GeneralScore": 13, "Text": math.nan}
+    rec = {"rojopolisGeneralScore": 13, "Text": math.nan}
     return QUALTRICS_MAP, rec
 
 def test_decider(setup_qualtrics_stub):
 
     qualtrics_map, rec = setup_qualtrics_stub
     res = decider(rec, qualtrics_map)
-    assert res == {"My90GeneralScore": 13}
+    assert res == {"rojopolisGeneralScore": 13}

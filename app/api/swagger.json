@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "My90 API",
-    "description": "My90 API",
+    "title": "rojopolis API",
+    "description": "rojopolis API",
     "version": "0.0.1"
   },
   "paths": {
@@ -90,10 +90,10 @@
                 "name": {
                   "type": "string"
                 },
-                "my90EncounterScore": {
+                "rojopolisEncounterScore": {
                   "type": "integer"
                 },
-                "my90GeneralScore": {
+                "rojopolisGeneralScore": {
                   "type": "integer"
                 },
                 "popluation": {
@@ -137,8 +137,8 @@
         },
         "security": [
           {
-            "my90-authorizer": [
-              "${my90_user_pool_resource_server_identifier}/agency.read"
+            "rojopolis-authorizer": [
+              "${rojopolis_user_pool_resource_server_identifier}/agency.read"
             ]
           }
         ],
@@ -271,8 +271,8 @@
         },
         "security": [
           {
-            "my90-authorizer": [
-              "${my90_user_pool_resource_server_identifier}/agency.read"
+            "rojopolis-authorizer": [
+              "${rojopolis_user_pool_resource_server_identifier}/agency.read"
             ]
           }
         ],
@@ -477,8 +477,8 @@
         },
         "security": [
           {
-            "my90-authorizer": [
-              "${my90_user_pool_resource_server_identifier}/questionResponsesMetadata.read"
+            "rojopolis-authorizer": [
+              "${rojopolis_user_pool_resource_server_identifier}/questionResponsesMetadata.read"
             ]
           }
         ],
@@ -610,8 +610,8 @@
         },
         "security": [
           {
-            "my90-authorizer": [
-              "${my90_user_pool_resource_server_identifier}/questions.read"
+            "rojopolis-authorizer": [
+              "${rojopolis_user_pool_resource_server_identifier}/questions.read"
             ]
           }
         ],
@@ -743,8 +743,8 @@
         },
         "security": [
           {
-            "my90-authorizer": [
-              "${my90_user_pool_resource_server_identifier}/questions.read"
+            "rojopolis-authorizer": [
+              "${rojopolis_user_pool_resource_server_identifier}/questions.read"
             ]
           }
         ],
@@ -864,8 +864,8 @@
         },
         "security": [
           {
-            "my90-authorizer": [
-              "${my90_user_pool_resource_server_identifier}/topics.read"
+            "rojopolis-authorizer": [
+              "${rojopolis_user_pool_resource_server_identifier}/topics.read"
             ]
           }
         ],
@@ -1101,8 +1101,8 @@
         },
         "security": [
           {
-            "my90-authorizer": [
-              "${my90_user_pool_resource_server_identifier}/responses.read"
+            "rojopolis-authorizer": [
+              "${rojopolis_user_pool_resource_server_identifier}/responses.read"
             ]
           }
         ],
@@ -1289,8 +1289,8 @@
         },
         "security": [
           {
-            "my90-authorizer": [
-              "${my90_user_pool_resource_server_identifier}/topics.read"
+            "rojopolis-authorizer": [
+              "${rojopolis_user_pool_resource_server_identifier}/topics.read"
             ]
           }
         ],
@@ -1315,14 +1315,14 @@
     }
   },
   "securityDefinitions": {
-    "my90-authorizer": {
+    "rojopolis-authorizer": {
       "type": "apiKey",
       "name": "Authorization",
       "in": "header",
       "x-amazon-apigateway-authtype": "cognito_user_pools",
       "x-amazon-apigateway-authorizer": {
         "providerARNs": [
-          "${my90_user_pool_arn}"
+          "${rojopolis_user_pool_arn}"
         ],
         "type": "cognito_user_pools"
       }
@@ -1404,15 +1404,15 @@
           "type": "number",
           "description": "longitude"
         },
-        "my90EncounterScore": {
+        "rojopolisEncounterScore": {
           "type": "number",
           "format": "float",
-          "description": "my90 encounter score"
+          "description": "rojopolis encounter score"
         },
-        "my90GeneralScore": {
+        "rojopolisGeneralScore": {
           "type": "number",
           "format": "float",
-          "description": "my90 general score"
+          "description": "rojopolis general score"
         }
       }
     },
@@ -1506,15 +1506,15 @@
           "type": "integer",
           "description": "count of items"
         },
-        "my90EncounterScoreAvg": {
+        "rojopolisEncounterScoreAvg": {
           "type": "number",
           "format": "float",
-          "description": "my90 encounter score average of items"
+          "description": "rojopolis encounter score average of items"
         },
-        "my90GeneralScoreAvg": {
+        "rojopolisGeneralScoreAvg": {
           "type": "number",
           "format": "float",
-          "description": "my90 general score average of items"
+          "description": "rojopolis general score average of items"
         }
       }
     },

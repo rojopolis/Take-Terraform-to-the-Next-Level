@@ -3,7 +3,7 @@
         "id": "SV_4JFLLqWZwHJGi3z",
         "name": "QA / Metropolis PD / Call for Service / Police Reported Demographics",
         "ownerId": "UR_73s2JubmBGFaLvT",
-        "organizationId": "my90",
+        "organizationId": "rojopolis",
         "isActive": true,
         "creationDate": "2018-12-07T03:11:25Z",
         "lastModifiedDate": "2018-12-07T05:12:43Z",
@@ -18,7 +18,7 @@
                     "selector": "SAVR",
                     "subSelector": "TX"
                 },
-                "questionText": "Hi, this is My90. We're an independent group that improves public safety with community feedback. We will share your thoughts directly to your police chief, but you will be ANONYMOUS. First, we need your consent. This will be a short conversation! Do you want to continue?",
+                "questionText": "Hi, this is rojopolis. We're an independent group that improves public safety with community feedback. We will share your thoughts directly to your police chief, but you will be ANONYMOUS. First, we need your consent. This will be a short conversation! Do you want to continue?",
                 "questionLabel": null,
                 "validation": {
                     "doesForceResponse": false
@@ -207,7 +207,7 @@
                     "selector": "SL",
                     "subSelector": null
                 },
-                "questionText": "Thanks for your feedback. You can view what others in your city and neighborhood are saying here: www.textmy90.com/community. If you have anything else to say, please text it now.",
+                "questionText": "Thanks for your feedback. You can view what others in your city and neighborhood are saying here: www.textrojopolis.com/community. If you have anything else to say, please text it now.",
                 "questionLabel": null,
                 "validation": {
                     "doesForceResponse": false
@@ -220,7 +220,7 @@
                     "selector": "SL",
                     "subSelector": null
                 },
-                "questionText": "Ok, someone will be in touch. Thanks for your feedback. You can view what others in your city and neighborhood are saying here: www.textmy90.com/community. If you have anything else to say, please text it now.",
+                "questionText": "Ok, someone will be in touch. Thanks for your feedback. You can view what others in your city and neighborhood are saying here: www.textrojopolis.com/community. If you have anything else to say, please text it now.",
                 "questionLabel": null,
                 "validation": {
                     "doesForceResponse": false
@@ -378,7 +378,7 @@
                     "selector": "SL",
                     "subSelector": null
                 },
-                "questionText": "Thanks for your feedback. You can view what others in your city and neighborhood are saying here: www.textmy90.com/community. If you have anything else to say, please text it now.",
+                "questionText": "Thanks for your feedback. You can view what others in your city and neighborhood are saying here: www.textrojopolis.com/community. If you have anything else to say, please text it now.",
                 "questionLabel": null,
                 "validation": {
                     "doesForceResponse": false
@@ -391,7 +391,7 @@
                     "selector": "SL",
                     "subSelector": null
                 },
-                "questionText": "Ok, someone will be in touch. Thanks for your feedback. You can view what others in your city and neighborhood are saying here: www.textmy90.com/community. If you have anything else to say, please text it now.",
+                "questionText": "Ok, someone will be in touch. Thanks for your feedback. You can view what others in your city and neighborhood are saying here: www.textrojopolis.com/community. If you have anything else to say, please text it now.",
                 "questionLabel": null,
                 "validation": {
                     "doesForceResponse": false
@@ -451,7 +451,7 @@
                 ]
             },
             "BL_cYjEINrxGUsY4jX": {
-                "description": "My90 Score / Encounter / English",
+                "description": "rojopolis Score / Encounter / English",
                 "elements": [
                     {
                         "type": "Question",
@@ -495,7 +495,7 @@
                 ]
             },
             "BL_8bT6RE4sg2hUB0x": {
-                "description": "My90 Score / Spanish",
+                "description": "rojopolis Score / Spanish",
                 "elements": [
                     {
                         "type": "Question",
@@ -732,11 +732,11 @@
                 "name": "IncidentId"
             },
             {
-                "name": "my90EncounterScore",
+                "name": "rojopolisEncounterScore",
                 "defaultValue": "${q://QID135400005/ChoiceTextEntryValue}"
             },
             {
-                "name": "my90GeneralScore"
+                "name": "rojopolisGeneralScore"
             }
         ],
         "comments": {},

@@ -31,8 +31,8 @@ SCALES = {
 
 
 # Fields expected to be retured with responses
-DEFAULT_RESPONSE_FIELDS =  'Choice,LSI,#d,Sort,#p, #t, Topic,Gender,Longitude,RespondentId,Age,Latitude,Origin,Race,IncidentCode,IncidentId,Sentiment,my90EncounterScore,my90GeneralScore,QuestionChoicesId,OpenResponse'
-DEFAULT_AGENCY_FIELDS = 'My90EncounterScore,CityRacePercent,CityGenderPercent,#p,My90GeneralScore,CityPopulation,Sort,LSI,ZoneofInterest,CityAgePercent,#n'
+DEFAULT_RESPONSE_FIELDS =  'Choice,LSI,#d,Sort,#p, #t, Topic,Gender,Longitude,RespondentId,Age,Latitude,Origin,Race,IncidentCode,IncidentId,Sentiment,rojopolisEncounterScore,rojopolisGeneralScore,QuestionChoicesId,OpenResponse'
+DEFAULT_AGENCY_FIELDS = 'rojopolisEncounterScore,CityRacePercent,CityGenderPercent,#p,rojopolisGeneralScore,CityPopulation,Sort,LSI,ZoneofInterest,CityAgePercent,#n'
 DEFAULT_QUESTION_FIELDS = 'QuestionChoicesId,Sort,Category,#p,#t'
 
 def get_table():
@@ -296,7 +296,7 @@ def responsesMetadata(aId,
 def count_and_mean(data):
     '''
     Aggregate data grouped by scale values, count it, and
-    calculate mean for my90 score(s).
+    calculate mean for rojopolis score(s).
     '''
     scales = SCALES
 
@@ -325,12 +325,12 @@ def field_count_score_avg(field_name, data, keys=None):
 
     for i in keys:
         group = grouped.get(i, [])
-        my90GeneralScoreAvgs = [x['my90GeneralScore'] for x in group if 'my90GeneralScore' in x] or [0]
-        my90EncounterScores = [x['my90EncounterScore'] for x in group if 'my90EncounterScore' in x] or [0]
+        rojopolisGeneralScoreAvgs = [x['rojopolisGeneralScore'] for x in group if 'rojopolisGeneralScore' in x] or [0]
+        rojopolisEncounterScores = [x['rojopolisEncounterScore'] for x in group if 'rojopolisEncounterScore' in x] or [0]
         response = {
             'count': len(group),
-            'my90GeneralScoreAvg': mean(my90GeneralScoreAvgs) if group else 0,
-            'my90EncounterScoreAvg': mean(my90EncounterScores) if group else 0
+            'rojopolisGeneralScoreAvg': mean(rojopolisGeneralScoreAvgs) if group else 0,
+            'rojopolisEncounterScoreAvg': mean(rojopolisEncounterScores) if group else 0
             }
         responses.append(response)
     return responses
