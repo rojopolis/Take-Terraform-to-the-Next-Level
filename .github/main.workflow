@@ -8,6 +8,6 @@ action "terraform-fmt" {
   args = "-recursive"
   secrets = ["GITHUB_TOKEN"]
   env = {
-    TF_ACTION_WORKING_DIR = "."
+    TF_ACTION_WORKING_DIR = "app"
   }
 }
