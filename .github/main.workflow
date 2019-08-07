@@ -8,18 +8,18 @@ action "filter-to-pr-open-synced" {
   args = "action 'opened|synchronize'"
 }
 
-action "terraform-fmt" {
-  uses = "hashicorp/terraform-github-actions/fmt@v0.3.4"
-  needs = "filter-to-pr-open-synced"
-  secrets = ["GITHUB_TOKEN"]
-  env = {
-    TF_ACTION_WORKING_DIR = "app"
-  }
-}
+#action "terraform-fmt" {
+#  uses = "hashicorp/terraform-github-actions/fmt@v0.3.4"
+#  needs = "filter-to-pr-open-synced"
+#  secrets = ["GITHUB_TOKEN"]
+#  env = {
+#    TF_ACTION_WORKING_DIR = "app"
+#  }
+#}
 
 action "terraform-init-cognito" {
   uses = "hashicorp/terraform-github-actions/init@v0.3.4"
-  needs = "terraform-fmt"
+  needs = "filter-to-pr-open-synced"
   secrets = ["GITHUB_TOKEN"]
   env = {
     TF_ACTION_WORKING_DIR = "app/cognito/user_pool"
