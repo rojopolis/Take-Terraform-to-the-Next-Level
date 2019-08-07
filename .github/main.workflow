@@ -20,7 +20,7 @@ action "filter-to-pr-open-synced" {
 action "terraform-init-cognito" {
   uses = "hashicorp/terraform-github-actions/init@v0.3.4"
   needs = "filter-to-pr-open-synced"
-  secrets = ["GITHUB_TOKEN"]
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
   env = {
     TF_ACTION_WORKING_DIR = "app/cognito/user_pool"
   }
@@ -29,7 +29,7 @@ action "terraform-init-cognito" {
 action "terraform-validate-cognito" {
   uses = "hashicorp/terraform-github-actions/validate@v0.3.4"
   needs = "terraform-init-cognito"
-  secrets = ["GITHUB_TOKEN"]
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
   env = {
     TF_ACTION_WORKING_DIR = "app/cognito/user_pool"
   }
