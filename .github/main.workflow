@@ -1,5 +1,5 @@
 workflow "Terraform" {
-  resolves = "terraform-plan"
+  resolves = "terraform-plan-cognito"
   on = "pull_request"
 }
 
@@ -37,7 +37,7 @@ action "terraform-validate-cognito" {
 
 action "terraform-plan-cognito" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
-  needs = "terraform-validate"
+  needs = "terraform-validate-cognito"
   secrets = ["GITHUB_TOKEN"]
   env = {
     TF_ACTION_WORKING_DIR = "app/cognito/user_pool"
