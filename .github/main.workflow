@@ -3,6 +3,11 @@ workflow "Terraform" {
   on = "pull_request"
 }
 
+action "Debug" {
+  uses = "actions/bin/sh@master"
+  args = ["env"]
+}
+
 action "filter-to-pr-open-synced" {
   uses = "actions/bin/filter@master"
   args = "action 'opened|synchronize'"
