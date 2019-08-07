@@ -1,5 +1,5 @@
 workflow "Terraform" {
-  resolves = "terraform-plan-cognito"
+  resolves = "Debug"
   on = "pull_request"
 }
 
