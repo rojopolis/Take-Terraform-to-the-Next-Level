@@ -1,5 +1,5 @@
 workflow "Terraform" {
-  resolves = ["terraform-apply-api-deployment"]
+  resolves = ["Debug", "terraform-apply-api-deployment"]
   on = "pull_request"
 }
 
