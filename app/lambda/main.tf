@@ -212,7 +212,7 @@ resource "aws_lambda_event_source_mapping" "etl_event_source_mapping" {
 }
 
 #-------------------------------------------------------------------------------
-#-- ProducerJobs
+#-- ProducerJobs 
 #-------------------------------------------------------------------------------
 module "producerjobs_handler_archive" {
   source      = "rojopolis/lambda-python-archive/aws"
