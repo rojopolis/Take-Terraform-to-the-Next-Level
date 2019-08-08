@@ -31,16 +31,6 @@ action "terraform-validate-cognito" {
   }
 }
 
-action "terraform-workspace-cognito" {
-  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
-  needs = "terraform-validate-cognito"
-  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
-  runs = ["sh", "-c", "cd $TF_ACTION_WORKING_DIR; terraform workspace select $GITHUB_HEAD_REF || terraform workspace new $GITHUB_HEAD_REF"]
-  env = {
-    TF_ACTION_WORKING_DIR = "app/cognito/user_pool"
-  }
-}
-
 action "terraform-plan-cognito" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
   needs = "terraform-validate-cognito"
@@ -199,5 +189,42 @@ action "terraform-plan-lambda" {
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
   env = {
     TF_ACTION_WORKING_DIR = "app/lambda"
+  }
+}
+
+action "terraform-init-cloudwatch" {
+  uses = "hashicorp/terraform-github-actions/init@v0.3.4"
+  needs = ["terraform-plan-lambda"]
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/cloudwatch"
+  }
+}
+
+action "terraform-validate-cloudwatch" {
+  uses = "hashicorp/terraform-github-actions/validate@v0.3.4"
+  needs = "terraform-init-cloudwatch"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/cloudwatch"
+  }
+}
+
+action "terraform-workspace-cloudwatch" {
+  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  needs = "terraform-validate-cloudwatch"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  runs = ["sh", "-c", "cd $TF_ACTION_WORKING_DIR; terraform workspace select $GITHUB_HEAD_REF || terraform workspace new $GITHUB_HEAD_REF"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/cloudwatch"
+  }
+}
+
+action "terraform-plan-cloudwatch" {
+  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  needs = "terraform-validate-cloudwatch"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/cloudwatch"
   }
 }
