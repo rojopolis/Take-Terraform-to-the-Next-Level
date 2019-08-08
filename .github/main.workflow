@@ -1,5 +1,5 @@
 workflow "Terraform" {
-  resolves = ["Debug", "terraform-plan-cognito"]
+  resolves = ["terraform-plan-cognito"]
   on = "pull_request"
 }
 
@@ -57,5 +57,43 @@ action "terraform-plan-cognito" {
 
   env = {
     TF_ACTION_WORKING_DIR = "app/cognito/user_pool"
+  }
+}
+
+action "terraform-init-dynamodb" {
+  uses = "hashicorp/terraform-github-actions/init@v0.3.4"
+  needs = "filter-to-pr-open-synced"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/dynamodb"
+  }
+}
+
+action "terraform-validate-dynamodb" {
+  uses = "hashicorp/terraform-github-actions/validate@v0.3.4"
+  needs = "terraform-init-dynamodb"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/cognito/dynamodb"
+  }
+}
+
+action "terraform-workspace-dynamodb" {
+  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  needs = "terraform-validate-dynamodb"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  runs = ["sh", "-c", "cd $TF_ACTION_WORKING_DIR; terraform workspace select $GITHUB_HEAD_REF || terraform workspace new $GITHUB_HEAD_REF"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/cognito/dynamodb"
+  }
+}
+
+action "terraform-plan-cognito" {
+  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  needs = "terraform-validate-dynamodb"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+
+  env = {
+    TF_ACTION_WORKING_DIR = "app/cognito/dynamodb"
   }
 }
