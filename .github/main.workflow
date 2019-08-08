@@ -1,5 +1,5 @@
 workflow "Terraform" {
-  resolves = ["terraform-plan-api-deployment"]
+  resolves = ["terraform-apply-api-deployment"]
   on = "pull_request"
 }
 
@@ -35,7 +35,17 @@ action "terraform-plan-cognito" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
   needs = "terraform-validate-cognito"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["-out", "plan.tfplan"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/cognito/user_pool"
+  }
+}
 
+action "terraform-apply-cognito" {
+  uses = "hashicorp/terraform-github-actions/apply@v0.3.4"
+  needs = "terraform-plan-cognito"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["plan.tfplan"]
   env = {
     TF_ACTION_WORKING_DIR = "app/cognito/user_pool"
   }
@@ -73,7 +83,17 @@ action "terraform-plan-dynamodb" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
   needs = "terraform-workspace-dynamodb"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["-out", "plan.tfplan"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/dynamodb"
+  }
+}
 
+action "terraform-apply-dynamodb" {
+  uses = "hashicorp/terraform-github-actions/apply@v0.3.4"
+  needs = "terraform-plan-dynamodb"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["plan.tfplan"]
   env = {
     TF_ACTION_WORKING_DIR = "app/dynamodb"
   }
@@ -111,7 +131,17 @@ action "terraform-plan-sqs" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
   needs = "terraform-workspace-sqs"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["-out", "plan.tfplan"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/sqs"
+  }
+}
 
+action "terraform-apply-sqs" {
+  uses = "hashicorp/terraform-github-actions/apply@v0.3.4"
+  needs = "terraform-plan-sqs"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["plan.tfplan"]
   env = {
     TF_ACTION_WORKING_DIR = "app/sqs"
   }
@@ -149,7 +179,17 @@ action "terraform-plan-kms" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
   needs = "terraform-workspace-kms"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["-out", "plan.tfplan"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/kms"
+  }
+}
 
+action "terraform-apply-kms" {
+  uses = "hashicorp/terraform-github-actions/apply@v0.3.4"
+  needs = "terraform-plan-kms"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["plan.tfplan"]
   env = {
     TF_ACTION_WORKING_DIR = "app/kms"
   }
@@ -188,6 +228,17 @@ action "terraform-plan-lambda" {
   uses = "./cicd/plan"
   needs = "terraform-workspace-lambda"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["-out", "plan.tfplan"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/lambda"
+  }
+}
+
+action "terraform-apply-lambda" {
+  uses = "hashicorp/terraform-github-actions/apply@v0.3.4"
+  needs = "terraform-plan-lambda"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["plan.tfplan"]
   env = {
     TF_ACTION_WORKING_DIR = "app/lambda"
   }
@@ -225,6 +276,17 @@ action "terraform-plan-cloudwatch" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
   needs = "terraform-workspace-cloudwatch"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["-out", "plan.tfplan"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/cloudwatch"
+  }
+}
+
+action "terraform-apply-cloudwatch" {
+  uses = "hashicorp/terraform-github-actions/apply@v0.3.4"
+  needs = "terraform-plan-cloudwatch"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["plan.tfplan"]
   env = {
     TF_ACTION_WORKING_DIR = "app/cloudwatch"
   }
@@ -252,6 +314,17 @@ action "terraform-plan-rest-api" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
   needs = "terraform-validate-rest-api"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["-out", "plan.tfplan"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/api/gateway_rest_api"
+  }
+}
+
+action "terraform-apply-rest-api" {
+  uses = "hashicorp/terraform-github-actions/apply@v0.3.4"
+  needs = "terraform-plan-rest-api"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["plan.tfplan"]
   env = {
     TF_ACTION_WORKING_DIR = "app/api/gateway_rest_api"
   }
@@ -289,6 +362,17 @@ action "terraform-plan-api-deployment" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
   needs = "terraform-workspace-api-deployment"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["-out", "plan.tfplan"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/api/gateway_deployment"
+  }
+}
+
+action "terraform-apply-api-deployment" {
+  uses = "hashicorp/terraform-github-actions/apply@v0.3.4"
+  needs = "terraform-plan-api-deployment"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  args = ["plan.tfplan"]
   env = {
     TF_ACTION_WORKING_DIR = "app/api/gateway_deployment"
   }
