@@ -229,3 +229,67 @@ action "terraform-plan-cloudwatch" {
     TF_ACTION_WORKING_DIR = "app/cloudwatch"
   }
 }
+
+action "terraform-init-rest-api" {
+  uses = "hashicorp/terraform-github-actions/init@v0.3.4"
+  needs = ["terraform-plan-cloudwatch"]
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/api/gateway_rest_api"
+  }
+}
+
+action "terraform-validate-rest-api" {
+  uses = "hashicorp/terraform-github-actions/validate@v0.3.4"
+  needs = "terraform-init-rest-api"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/api/gateway_rest_api"
+  }
+}
+
+action "terraform-plan-rest-api" {
+  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  needs = "terraform-validate-rest-api"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/api/gateway_rest_api"
+  }
+}
+
+action "terraform-init-api-deployment" {
+  uses = "hashicorp/terraform-github-actions/init@v0.3.4"
+  needs = ["terraform-plan-rest-api"]
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/api/gateway_deployment"
+  }
+}
+
+action "terraform-validate-api-deployment" {
+  uses = "hashicorp/terraform-github-actions/validate@v0.3.4"
+  needs = "terraform-init-api-deployment"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/api/gateway_deployment"
+  }
+}
+
+action "terraform-workspace-api-deployment" {
+  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  needs = "terraform-validate-api-deployment"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  runs = ["sh", "-c", "cd $TF_ACTION_WORKING_DIR; terraform workspace select $GITHUB_HEAD_REF || terraform workspace new $GITHUB_HEAD_REF"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/api/gateway_deployment"
+  }
+}
+
+action "terraform-plan-api-deployment" {
+  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  needs = "terraform-workspace-api-deployment"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/api/gateway_deployment"
+  }
+}
