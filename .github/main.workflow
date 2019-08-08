@@ -197,7 +197,7 @@ action "terraform-apply-kms" {
 
 action "terraform-init-lambda" {
   uses = "hashicorp/terraform-github-actions/init@v0.3.4"
-  needs = ["terraform-plan-kms", "terraform-plan-dynamodb", "terraform-plan-sqs", "terraform-plan-cognito",]
+  needs = ["terraform-apply-kms", "terraform-apply-dynamodb", "terraform-apply-sqs", "terraform-apply-cognito",]
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
   env = {
     TF_ACTION_WORKING_DIR = "app/lambda"
@@ -246,7 +246,7 @@ action "terraform-apply-lambda" {
 
 action "terraform-init-cloudwatch" {
   uses = "hashicorp/terraform-github-actions/init@v0.3.4"
-  needs = ["terraform-plan-lambda"]
+  needs = ["terraform-apply-lambda"]
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
   env = {
     TF_ACTION_WORKING_DIR = "app/cloudwatch"
@@ -294,7 +294,7 @@ action "terraform-apply-cloudwatch" {
 
 action "terraform-init-rest-api" {
   uses = "hashicorp/terraform-github-actions/init@v0.3.4"
-  needs = ["terraform-plan-cloudwatch"]
+  needs = ["terraform-apply-cloudwatch"]
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
   env = {
     TF_ACTION_WORKING_DIR = "app/api/gateway_rest_api"
@@ -332,7 +332,7 @@ action "terraform-apply-rest-api" {
 
 action "terraform-init-api-deployment" {
   uses = "hashicorp/terraform-github-actions/init@v0.3.4"
-  needs = ["terraform-plan-rest-api"]
+  needs = ["terraform-apply-rest-api"]
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
   env = {
     TF_ACTION_WORKING_DIR = "app/api/gateway_deployment"
