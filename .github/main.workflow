@@ -164,3 +164,41 @@ action "terraform-plan-kms" {
     TF_ACTION_WORKING_DIR = "app/kms"
   }
 }
+
+action "terraform-init-lambda" {
+  uses = "hashicorp/terraform-github-actions/init@v0.3.4"
+  needs = ["terraform-plan-kms", "terraform-plan-dynamodb", "terraform-plan-sqs", "terraform-plan-cognito",]
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/lambda"
+  }
+}
+
+action "terraform-validate-lambda" {
+  uses = "hashicorp/terraform-github-actions/validate@v0.3.4"
+  needs = "terraform-init-lambda"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/lambda"
+  }
+}
+
+action "terraform-workspace-lambda" {
+  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  needs = "terraform-validate-lambda"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  runs = ["sh", "-c", "cd $TF_ACTION_WORKING_DIR; terraform workspace select $GITHUB_HEAD_REF || terraform workspace new $GITHUB_HEAD_REF"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/lambda"
+  }
+}
+
+action "terraform-plan-lambda" {
+  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  needs = "terraform-validate-lambda"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+
+  env = {
+    TF_ACTION_WORKING_DIR = "app/lambda"
+  }
+}
