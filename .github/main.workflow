@@ -1,5 +1,5 @@
 workflow "Terraform" {
-  resolves = ["terraform-plan-cloudwatch"]
+  resolves = ["terraform-plan-api-deployment"]
   on = "pull_request"
 }
 
