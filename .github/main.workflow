@@ -40,13 +40,22 @@ action "terraform-validate-cognito" {
   }
 }
 
+action "terraform-workspace-cognito" {
+  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  needs = "terraform-validate-cognito"
+  secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  runs = ["sh", "-c", "cd $TF_ACTION_WORKING_DIR; terraform workspace select $GITHUB_HEAD_REF || terraform workspace new $GITHUB_HEAD_REF"]
+  env = {
+    TF_ACTION_WORKING_DIR = "app/cognito/user_pool"
+  }
+}
+
 action "terraform-plan-cognito" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
   needs = "terraform-validate-cognito"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
-  runs = ["sh", "-c", "\"TF_ACTION_WORKSPACE=$GITHUB_HEAD_REF /entrypoint.sh\""]
+
   env = {
     TF_ACTION_WORKING_DIR = "app/cognito/user_pool"
-    TF_ACTION_WORKSPACE = "$$GITHUB_HEAD_REF"
   }
 }
