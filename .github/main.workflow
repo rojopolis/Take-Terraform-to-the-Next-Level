@@ -71,7 +71,7 @@ action "terraform-workspace-dynamodb" {
 
 action "terraform-plan-dynamodb" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
-  needs = "terraform-validate-dynamodb"
+  needs = "terraform-workspace-dynamodb"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
 
   env = {
@@ -109,7 +109,7 @@ action "terraform-workspace-sqs" {
 
 action "terraform-plan-sqs" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
-  needs = "terraform-validate-sqs"
+  needs = "terraform-workspace-sqs"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
 
   env = {
@@ -147,7 +147,7 @@ action "terraform-workspace-kms" {
 
 action "terraform-plan-kms" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
-  needs = "terraform-validate-kms"
+  needs = "terraform-workspace-kms"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
 
   env = {
