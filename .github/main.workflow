@@ -184,8 +184,9 @@ action "terraform-workspace-lambda" {
 }
 
 action "terraform-plan-lambda" {
-  uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
-  needs = "terraform-validate-lambda"
+  #uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
+  uses = "./cicd/plan"
+  needs = "terraform-workspace-lambda"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
   env = {
     TF_ACTION_WORKING_DIR = "app/lambda"
@@ -222,7 +223,7 @@ action "terraform-workspace-cloudwatch" {
 
 action "terraform-plan-cloudwatch" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
-  needs = "terraform-validate-cloudwatch"
+  needs = "terraform-workspace-cloudwatch"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
   env = {
     TF_ACTION_WORKING_DIR = "app/cloudwatch"
