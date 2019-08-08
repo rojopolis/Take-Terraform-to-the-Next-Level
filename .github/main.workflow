@@ -1,5 +1,5 @@
 workflow "Terraform" {
-  resolves = ["terraform-plan-cognito", "terraform-plan-dynamodb", "terraform-plan-kms", "terraform-plan-sqs"]
+  resolves = ["terraform-plan-lambda"]
   on = "pull_request"
 }
 
