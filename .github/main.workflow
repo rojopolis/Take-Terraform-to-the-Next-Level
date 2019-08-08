@@ -88,7 +88,7 @@ action "terraform-workspace-dynamodb" {
   }
 }
 
-action "terraform-plan-cognito" {
+action "terraform-plan-dynamodb" {
   uses = "hashicorp/terraform-github-actions/plan@v0.3.4"
   needs = "terraform-validate-dynamodb"
   secrets = ["GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
